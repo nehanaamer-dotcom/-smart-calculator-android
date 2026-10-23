@@ -1,0 +1,41 @@
+الحاسبة الذكية للأندرويد — Python + Kivy
+
+هذه حزمة مصدر مشروع، وليست APK جاهزًا. لم يتم بناء ملف APK داخل هذه الحزمة.
+
+الأسهل لمستخدم تابلت أندرويد:
+استخدم GitHub Actions لبناء APK على خادم Linux دون تثبيت Android SDK/NDK على التابلت.
+
+الملفات:
+- main.py: تطبيق الحاسبة.
+- buildozer.spec: إعدادات Buildozer.
+- .github/workflows/build-apk.yml: سير عمل بناء APK تلقائيًا.
+- BUILD_AR.txt: تعليمات عربية.
+
+طريقة البناء عبر GitHub:
+1. سجّل الدخول إلى GitHub وأنشئ مستودعًا جديدًا (Repository) فارغًا.
+2. استخرج ZIP على جهازك، ثم ارفع كل الملفات والمجلد المخفي .github إلى المستودع. إذا رفعت من متصفح الهاتف، تأكد أن .github/workflows/build-apk.yml موجود في المستودع؛ قد تحتاج إلى الرفع عبر GitHub Desktop أو git من كمبيوتر.
+3. ارفع الملفات إلى الفرع main.
+4. افتح المستودع على GitHub ثم تبويب Actions.
+5. اختر "Build Android APK" ثم "Run workflow" إن لم يبدأ تلقائيًا.
+6. انتظر حتى ينتهي التشغيل بنجاح.
+7. افتح تشغيل الـ workflow الناجح، ثم نزّل Artifact باسم smart-calculator-debug-apk.
+8. استخرج ملف الـ artifact للحصول على ملف .apk.
+9. انقل APK إلى التابلت، وافتحه وثبّته. إذا طلب أندرويد السماح بالتثبيت من هذا المصدر، اسمح به.
+
+ملاحظات:
+- أول بناء قد يستغرق عدة دقائق لأنه ينزّل أدوات Android.
+- الناتج Debug APK للتجربة، وليس إصدارًا موقعًا للنشر على متجر Play.
+- لا تشارك مفاتيح أو أسرارًا شخصية في المستودع.
+- يمكن أيضًا البناء محليًا على Ubuntu/Linux باستخدام Buildozer؛ انظر التعليمات أدناه.
+
+بناء محلي على Ubuntu/Linux:
+  sudo apt update
+  sudo apt install -y python3-pip python3-venv git zip unzip openjdk-17-jdk \
+      autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev \
+      libtinfo6 cmake libffi-dev libssl-dev
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install --upgrade pip setuptools wheel
+  pip install buildozer cython
+  buildozer android debug
+ثم ابحث عن APK في مجلد bin/.
