@@ -1,4 +1,5 @@
 [app]
+android.accept_sdk_license = True
 title = الحاسبة الذكية
 package.name = smartcalculator
 package.domain = org.example
