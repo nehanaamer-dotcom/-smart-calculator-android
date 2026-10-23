@@ -1,40 +1,58 @@
 name: Build Android APK
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
+    name: Build debug APK
     runs-on: ubuntu-22.04
+    timeout-minutes: 120
     steps:
-      - name: Checkout project
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            python3-pip python3-venv git zip unzip \
-            openjdk-17-jdk \
-            autoconf libtool pkg-config zlib1g-dev \
-            libncurses5-dev libncursesw5-dev libtinfo6 \
-            cmake libffi-dev libssl-dev
+          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip python3-venv autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev automake
+          git --version
+          java -version
 
-      - name: Install Python build tools
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Buildozer
         run: |
-          python3 -m pip install --user --upgrade pip setuptools wheel
-          python3 -m pip install --user buildozer cython
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install buildozer cython==0.29.34
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Verify tools
+        run: |
+          which git
+          git --version
+          which buildozer
+          buildozer --version
 
       - name: Build debug APK
         env:
-          PATH: /home/runner/.local/bin:${{ env.PATH }}
-        run: buildozer android debug
+          BUILDOZER_WARN_ON_ROOT: "0"
+          APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
+        run: buildozer -v android debug
 
       - name: Upload APK artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: smart-calculator-debug-apk
           path: bin/*.apk
           if-no-files-found: error
+          retention-days: 7
